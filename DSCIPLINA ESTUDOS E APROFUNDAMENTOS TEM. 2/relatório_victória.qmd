@@ -1,0 +1,856 @@
+---
+title: "Portifolio de estudos e aprofundamentos II"
+author: "Victoria Carminatti"
+format:
+  html:
+    self-contrained: true
+editor: visual
+---
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+# 21  de novembro de 2024:
+
+```{r}
+install.packages("mirt") 
+library((WrightMap)
+```
+
+pacote:
+
+```{r}
+library(readr)
+banco.2pl <- read_delim("dados/banco2PL.csv",
+                        delim = ";",
+                        escape_double = FALSE, trim_ws = TRUE)
+```
+
+Para confirmar que os itens são dicotômicos:
+
+```{r}
+table(banco.2pl$Item_1)
+
+```
+
+função apply para toda a tabela (quando usa 2, a função percorre cada coluna):
+
+```{r}
+apply(banco.2pl, 2, table)
+```
+
+Inspecionando a estrutura do banco de dados:
+
+```{r}
+str(banco.2pl)
+```
+
+converter para matriz:
+
+```{r}
+banco.2pl <- as.matrix(banco.2pl)
+```
+
+Para calibrar os itens no modelo logístico de dois parâmetros: ?
+
+```{r}
+fit.2pl <- mirt(data = banco.2pl, model = 1, itemtype = '2PL')
+
+
+
+```
+
+# 07 de novembro de 2024:
+
+Pacotes Instalados no dia de hoje:
+
+#install.packages("psychTools") #install.packages("psych") #install.packages("CTT")
+
+\*(explicar para que serve cada pacote)\*
+
+```{r}
+install.packages("psychTools")
+```
+
+```{r}
+install.packages("psych")
+```
+
+```{r}
+install.packages("CTT")
+
+```
+
+## **TCT com Itens Dicotômicos:**
+
+(explicar o que é).
+
+### **Banco de Dados (utilozados na aula de hoje):**
+
+Carregando o banco de dados `ability` diretamente do pacote `psychTools`:
+
+```{r}
+dados <- psychTools::ability
+```
+
+Verificando os nomes no banco:
+
+```{r}
+names(dados)
+```
+
+Por que será que não deu certo o comando `names()` no *chunk* anterior? Verificando a classe e a estrutura do banco:
+
+\*verificar o tipo de objeto criado\*
+
+```{r}
+class(dados)
+```
+
+```{r}
+str(dados)
+```
+
+```{r}
+colnames(dados)  
+```
+
+A seguir mudamos a classe do objeto dados de uma matriz para um data.frame e podemos usar o `names()` para verificar os nomes das colunas:
+
+```{r}
+dados <- as.data.frame(dados)
+```
+
+#transformar o objeto de matriz para data.frame names(dados)
+
+## **Estatísticas Descritivas dos Itens:**
+
+Usamos o pacote `psych` para calcular a média, desvio-padrão e outras estatísticas descritivas dos itens: (complementar)
+
+```{r}
+psych::describe(dados)
+```
+
+### **Interpretando:**
+
+Responda às seguintes questões:
+
+-   Quantas pessoas, em média, responderam a cada item?
+
+-   Qual os valores máximo e mínimo observado para as variáveis?
+
+-   Qual o item mais difícil de todos? Explique como chegou à sua conclusão.
+
+rotate são os mais dificieis/ 0.19. 022. 020, raciocinio matricial em segundo, letters em terceiro e por ultimo reason, de acordo com as maiores medias.
+
+Rotates tem menos porcentagens na media, ou seja de acerto.
+
+(complementar)
+
+## **Escore Total ou Observado:**
+
+O escore total é a soma das respostas dos testandos, que nos itens dicotômicos estão codificadas como `0` e `1`. ( complementar).
+
+#criar um objeto com os escores
+
+```{r}
+escores <- dados 
+
+
+```
+
+#soma as respostas, removendo as céluas NA.
+
+```{r}
+escores$escore_total <- rowSums(dados, na.rm = TRUE)
+```
+
+#histograma para ver a distribuição dos escores totais:
+
+```{r}
+hist(escores$escore_total)
+
+```
+
+#descritiva dos escores totais:
+
+```{r}
+psych::describe(escores$escore_total, quant = c(.25, .75))
+
+```
+
+### **Interpretando:**
+
+-   Descrever a distribuição do escore:
+
+## **Parâmetros da TCT**
+
+Para calcular os parâmetros da TCT para os itens, usamos o pacote `CTT`, que é a sigla em inglês para a TCT (Classical Test Theory). Com apenas um comando, conseguimos calcular a dificuldade e a discriminação dos itens, bem como a fidedignidade da escala; **( complementar)**
+
+#carregar o pacote:
+
+```{r}
+library(CTT)
+```
+
+#calcular os parâmetros e criar o objeto tct:
+
+```{r}
+tct <- CTT::itemAnalysis(dados) 
+```
+
+```{r}
+names(tct)
+```
+
+Criamos um objeto chamado `tct` a partir da função `CTT::itemAnalysis(dados)`, que calculou os parâmetros psicométricos dos itens a partir da TCT e armazenou os resultados nesse objeto. Em seguida, usamos o comando `names(tct)` para listar os nomes dos componentes presentes no objeto `tct`:
+
+-   `nItem`: número de itens no teste.
+
+-   `nPerson`: número de respondentes (pessoas) no teste.
+
+-   `alpha`: valor do alfa de Cronbach, que indica a confiabilidade do teste.
+
+-   `scaleMean`: média dos escores totais dos respondentes.
+
+-   `scaleSD`: desvio-padrão dos escores totais.
+
+-   `itemReport`: um data.frame com estatísticas detalhadas sobre cada item, como dificuldade e discriminação.
+
+Então, criamos um outro objeto chamado `parametros` com os parâmetros da TCT do teste:
+
+#pegar os parâmetros dos itens dentro do objeto tct
+
+```{r}
+parametros <- tct$itemReport
+```
+
+```{r}
+names(parametros)
+```
+
+Extraímos os parâmetros dos itens do objeto `tct` e os armazenamos no objeto `parametros`. Em seguida, ao executar `names(itemReport)`, visualizamos os nomes das colunas do `data.frame` `itemReport`, que representam diferentes estatísticas dos itens:
+
+-   `itemName`: Nome ou outro identificador do item.
+
+-   `itemMean`: Dificuldade do item, ou seja, a média do item, que indica a proporção de acertos (ou respostas corretas) para cada item.
+
+-   `pBis`: Correlação ponto-bisserial, que mede a discriminação de cada item em relação ao escore total.
+
+-   `bis`: Correlação bisserial, uma medida alternativa de discriminação do item.
+
+-   `alphaIfDeleted`: Valor do alfa de Cronbach se o item fosse removido, indicando o impacto da remoção do item na confiabilidade do teste.
+
+Essas informações são essenciais para avaliar a qualidade psicométrica de cada item no teste. **(complementar)**
+
+### **Dificuldade (ou Facilidade) dos Itens:**
+
+Na TCT para itens dicotômicos, a dificuldade de um item é um parâmetro que indica a proporção de respondentes que acertaram o item. Ela é uma medida quantitativa simples que ajuda a avaliar o quão fácil ou difícil um item é para a amostra de testados. Ou seja, a dificuldade é representada pela média das respostas ao item em termos binários (0 para erro e 1 para acerto). Um valor de dificuldade próximo de 1 indica que a maioria dos respondentes acertou o item, ou seja, o item é fácil. Um valor próximo de 0 indica que poucos respondentes acertaram o item, sugerindo que ele é difícil.**(compl)**
+
+\*Dificuldade = Soma das respostas corretas / número total de respondentes
+
+#### **Interpretação**
+
+-   **Itens fáceis**: um índice de dificuldade alto (perto de 1), indicando que muitos participantes acertaram.
+
+-   **Itens de dificuldade média**: valores de dificuldade em torno de 0,5, sendo considerados os mais informativos para discriminar entre indivíduos com diferentes níveis do traço medido.
+
+-   **Itens difíceis**: um índice de dificuldade baixo (perto de 0), mostrando que poucos participantes acertaram.
+
+Na TCT, o objetivo é ter uma distribuição de dificuldades que permita medir de forma eficaz toda a faixa do traço que se deseja avaliar, garantindo que o teste seja balanceado e discriminativo para diferentes níveis de habilidade.
+
+#### **Plotando a Dificuldade dos Itens:**
+
+\# Plotar a dificuldade dos itens:
+
+-   Qual tipo de item é o mais fácil, reason, letter, matrix ou rotate? Explique como chegou à sua conclusão.
+
+# 17 de outubro de 2024:
+
+1- Qual a estrutura do objeto criado com o banco de dados?
+
+```{r}
+str(Ten_Item_Personality_Inventory_TIPI_respostas_)
+```
+
+2- Quais os nomes das variáveis no banco?
+
+```{r}
+names(Ten_Item_Personality_Inventory_TIPI_respostas_)
+#names(Ten_Item_Personality_Inventory_TIPI_respostas_) [(Ten_Item_Personality_Inventory_TIPI_respostas_) != "Carimbo de data/hora"]
+```
+
+3- Para cada fator do Big Five, quais são os pares de itens?
+
+Exteoversão e reservado-
+
+```{r}
+dados[, c(2,7)]
+```
+
+Critico e simpatico:
+
+```{r}
+dados[, c(3,8)]
+
+```
+
+Confiavel- auto disciplinado e desorganizado:
+
+```{r}
+dados[, c(4,9)]
+```
+
+Abertura a novas experiencias e convencional:
+
+```{r}
+dados[, c(6,11)]
+```
+
+Ansioso e calmo:
+
+```{r}
+dados[, c(5,10)]
+```
+
+4- Qual a média, a mediana e o desvio-padrão de cada variável?
+
+```{r}
+dados_numericos <- Ten_Item_Personality_Inventory_TIPI_respostas_[ ,-1]
+
+```
+
+OBS: objetivo deste código: excluir a primeira coluna que não se encaixa como uma variavel.
+
+**MEDIA:**
+
+```{r}
+media <- sapply(dados_numericos, mean, na.rm = TRUE)
+```
+
+Para exibir resultados:
+
+```{r}
+media
+```
+
+**MEDIANA:**
+
+```{r}
+mediana <- sapply(dados_numericos, median, na.rm = TRUE)
+```
+
+Para exibir resultados:
+
+```{r}
+mediana
+```
+
+**DESVIO PADRÃO:**
+
+```{r}
+desvio_padrao <- sapply(dados_numericos, sd, na.rm = TRUE)
+```
+
+Para exibir resultados:
+
+```{r}
+desvio_padrao
+```
+
+5- Qual o total e o percentual de dados faltosos para cada variável?
+
+Total de dados que são faltosos para cada variavél:
+
+```{r}
+total_faltosos <- sapply(dados, function(x) sum(is.na(x)))
+```
+
+percentual de dados faltosos para cada variavél
+
+```{r}
+percentual_faltosos <- sapply(dados, function(x)mean(is.na(x)) * 100)
+
+```
+
+6- Elabore um histograma para cada variável.
+
+\# (passo 1) Remover a coluna de carimbo de data/hora:
+
+```{r}
+dados_numericos <- Ten_Item_Personality_Inventory_TIPI_respostas_[ ,-1]
+
+```
+
+\# (passo 2) Criar histograma para cada variavel numérica:
+
+```{r}
+ 	 	for (i in 1:ncol(dados_numericos)) {
+  hist(dados_numericos[[i]], main=names(dados_numericos)[i], xlab=names(dados_numericos)[i], col="lightblue", border="black")
+}
+  
+```
+
+obs: Histograma para cada variavel numerico, excluindo a primeira coluna)
+
+7- Há presença de outliers? Faça uma inspeção visual criando um boxplot para cada variável.
+
+```{r}
+for (i in 1:ncol(dados_numericos)) {
+  boxplot(dados_numericos[[i]], main=names(dados_numericos)[i], xlab=names(dados_numericos)[i], col="lightblue", border="black")
+}
+```
+
+8-Quais as correlações entre todo os pares possíveis de variáveis (com exceção de `Carimbo de data/hora`{style="box-sizing: border-box; font-family: SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace; font-size: 13.125px; color: rgb(232, 62, 140); overflow-wrap: break-word;"})? Apresente a matriz de correlações, o mapa de calor e os paineis de pares de variáveis.
+
+MATRIZ:
+
+```{r}
+matriz_correlacao <- cor(dados_numericos, use = "complete.obs")
+```
+
+EXIBINDO MATRIZ:
+
+```{r}
+matriz_correlacao
+```
+
+**MAPA DE CALOR:**
+
+```{r}
+heatmap(matriz_correlacao, main = "Mapa de Calor - Correlações", col = colorRampPalette(c("blue", "white", "red"))(20), symm = TRUE)
+
+```
+
+**PAINEIS DE PARES:**
+
+```{r}
+library(psych)
+```
+
+```{r}
+pairs.panels(dados_numericos, main = "Painéis de Pares de Variáveis")
+
+```
+
+9- Considerando a teoria do Big Five, avalie a qualidade do instrumento `Ten-Item Personality Inventory-(TIPI)`{style="box-sizing: border-box; font-family: SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace; font-size: 13.125px; color: rgb(232, 62, 140); overflow-wrap: break-word;"}. Ele parece ser bom para avaliar os cinco fatores? As correlações entre as variáveis se comportaram conforme esperado teoricamente?
+
+(responder em casa)
+
+\*\* Sobrou tempo? Aproveite para melhorar seu portfólio. Não deixe nenhuma atividade para trás, nenhuma análise sem explicação e nenhum código sem comentários.
+
+# **26 de setembro de 2024.**
+
+nesta aula, aprendemos sobre
+
+**instalando o pych**
+
+```{r}
+#install.packages("psych")
+library(psych)
+```
+
+```{r}
+
+```
+
+**Abrir o banco de dados:**
+
+o pacote psych vem com alguns bancos de dados
+
+```{r}
+data(bfi) 
+```
+
+**ESTRUTURA DO BANCO DE DADOS**
+
+```{r}
+str(bfi)
+```
+
+```{r}
+head(bfi)
+```
+
+Comentario: head refre-se ao cabeçalho da estrutura criada.
+
+```{r}
+names(bfi)
+```
+
+Comentário: "names" é utilizado para identificar/visualizar as variaveis e as suas correspondencias com as facetas do bfi.
+
+```{r}
+summary(bfi)
+```
+
+comentário: O sumario é utilizado para conseguir identificar de forma mais organizada as variaveis e seus resultados.
+
+**ESTATISTICAS DESCRITIVAS:**
+
+```{r}
+summary(object = bfi)
+```
+
+```{r}
+psych::describe(x=bfi)
+```
+
+```{r}
+psych::describe(x =bfi,quant= c(.1,.2,.3,.4,.5,.6,.7,.8,.9))
+```
+
+```{r}
+psych::describeBy(x =bfi,group = "gender", digits = 2 )
+```
+
+```{r}
+table(bfi$gender)
+```
+
+**SELECIONANDI APENAS OS ITENS DE PERSONALIDADE NO BANCO BFI**
+
+```{r}
+#selecionar variaveis 
+#selecionando colunas 1 a 25 e todas as linhas
+#as linhas vêm antes da "," e as colunas depois da ","
+bfi[1:25]
+#selecionar linhas
+#selecionandi as linhas 1 a 10 e as colunas 1 a 5
+bfi[1:10, 1:5]
+```
+
+```{r}
+#selecionando somente os itens de personalidade, que são os 25 primeiros do banco bfi
+dados <-bfi[,1:25]
+```
+
+```{r}
+psych::multi.hist(x = dados,
+                  ncol = 5, nrow = 5,
+                  density = TRUE, bcol = "darkblue", dcol = "red", global = TRUE)
+```
+
+```{r}
+boxplot(dados, border = "darkred")
+
+
+```
+
+**CORRELAÇÕES:**
+
+# 5 de setembro de 2024
+
+# 29 de agosto de 2024
+
+O R é uma linguagem de programação voltada á analise de dados. O
+
+```{r}
+
+```
+
+Rstudio é uma interface um pouco mais amigavel para usar o R. No R precisamos uisar códigos para poder realizar uma tafrefa. Oui seja, no R não usamos o mouse para realizar as tarefas.
+
+O R possui diversos
+
+# 22 de agosto de 2024
+
+Nesta aula foi instalado o Rstudio, aprendi sobre o inicio das configurações de uso, organização, uso de letras, numeros e envio de dados, bem como a criação de planilha com dados no exel e orientação de como seriam os seguimentos das aulas.
+
+O R foi instalado a partir dos respectivos links :
+
+[The Comprehensive R Archive Network (r-project.org)](https://cran.r-project.org/)
+
+[RStudio Desktop - Posit RStudio Desktop - Posit](https://posit.co/download/rstudio-desktop/)
+
+Nesta aula nós criamos uma pasta no computador chamada "Disciplina estudos e aprofundamentos tem.2". obs ( C:\Users\luanc\OneDrive\Vic\Mestrado\DSCIPLINA ESTUDOS E APROFUNDAMENTOS TEM. 2) Dentro desta pasta eu criei uma subpasta chamada "dados ",na pasta ... eu vou sempre salvar os bancos de dados que forma trabalhados em aula.
+
+alem disso, dentro dessa pasta eu criei um projeto do R chamada ". relatorio_victoria.qmd" . Nesta mesma pasta eu criei um arquivo com meu portifolio em formato ".qmd. O nome do meu portiofolio é "relatorio_victória.qmd". Essa é a principal atividade avaliativa da disciplina.
+
+Ao final de cada aula, eu posso gerar uma página html com o meu portifolio. Para tanto basta eu clicar no botão render no Rstudio.
+
+INSTALANDO UM PACOTE:
+
+Para instalar um pacote do R, usamos um código como a seguir:
+
+```{r}
+install.packagens ("readxl")
+
+```
+
+Eu não preciso instalar um pacote todas as vezes que eu for usar o R, eu so preciso instalar um pacote nas seguintes situações:
+
+-   Quando eu instalar ou Reinstalar o R ou
+
+-   Quando eu quiser atualizar um pacote.
+
+    CARREGANDO UM PACOTE:
+
+-   Sempre que eu abrir o R, eu preciso carregar os pacotes que eu for usar nas analises. Para carregar um pacote, uso devo usar um código como a seguir:
+
+    ```{r}
+    #carregar o pacote:
+    library(readxl)
+    #abrir o banco de dados
+    ##exemplo: é o nome do objeto que será criado no R
+    ##read_excel() é a funçaõ do pacote readxl
+    ##path é o caminho do meu aqrquivo no meu computador
+    exemplo <- read_excel(path = "dados/exemplo.xlsx")
+
+    ```
+
+Uma forma alternativa para carregar os pacotes é a seguinte:
+
+```{r}
+readxl::read_excel(path = "dados/exemplo.xlsx")
+```
+
+# **12 de setembro de 2024:**
+
+OBJETO:
+
+No R, um objeto
+
+Nomeando objetos:
+
+Ao nomear um objeto no R, existem algumas regras basicas:
+
+1- Iniciar com letra ou ponto: o nome deve começar com letra maiuscula ou minuscula ou um ponto, mas não com um numero.
+
+2- nao usar palavras reservadas: certas palavras como If, else,true, e false, são reservados
+
+exemplo:: minha_variavel, meu.obejto são validos.
+
+```{r}
+# como nomear objetos:
+exemplo.de.nome.<-"exemplo"
+exemplo_de_nome.<-"exemplo"
+exemplonome.<-"exemplo"
+nomeExemplo<-"exemplo"
+nome999<-"exemplo"
+
+```
+
+```{r}
+# como nomear objetos:
+nome<-"exemplo"
+idade<-"exemplo"
+nota<-"exemplo"
+
+
+          
+
+
+```
+
+```{r eval=FALSE}
+# como NÃO nomear objetos:
+#99nome <-"valor"
+#TRUE <-"valor"
+#if<_"valor"
+
+```
+
+Aqui estão algumas dicas para nomear objetos no R de forma eficiente e clara:
+
+1\.
+
+2\.
+
+3\.
+
+4\.
+
+**OBJETOS E TIPOS DE DADOS:**
+
+**numéricos:**
+
+Armazena numeros, podendo ser inteiros ou decimais. No caso de decimais, o R usa como separador o ".", não a "."
+
+```{r}
+# criando um objeto numérico:
+numero.um<- 1 
+numero.dois <- 2 
+numero_inteiro <-543
+decimais<-0.5
+
+# verificando o que tem dentro do objeto:
+numero.um
+numero.dois
+numero_inteiro
+decimais
+
+# verificando o tipo de (classe) de dados de um objeto :
+class(numero.um)
+class(numero.dois)
+class(numero_inteiro)
+class(decimais)
+
+```
+
+caracteres:
+
+```{r}
+
+# criando um objeto string (caractere):
+meu.texto <- " preto"
+meunome<-"victoria"
+outro_texto<- " rosa"
+titulo <- "cores"
+
+
+# verificando o que tem dentro do obejto:
+meu.texto
+meunome 
+outro_texto 
+titulo
+
+
+# verificando o tipo de dado de um objeto:
+class(meu.texto)
+class(meunome)
+class(outro_texto)
+class(titulo)
+
+
+
+```
+
+```{r}
+
+x<-5
+y<-10
+
+
+# comparação que retorna um valor booleano
+x==y #false
+x<y #true
+y>x #true
+y!= x #true
+```
+
+Fator:
+
+```{r}
+# criando um vetor com categorias
+sexo <-c ("masculino","feminino", "feminino", "maculino")
+
+# convertendo para fator
+fator_sexo<- factor(sexo)
+
+# verificando os niveis:
+levels(fator_sexo)
+
+
+```
+
+```{r}
+
+cores <- c("preto","rosa","azul")
+fator_cores <-  factor(cores)
+levels(fator_cores)
+
+
+```
+
+```         
+```
+
+```{r}
+# criando vetores numericos, de caracteres e lógicos
+vetor_numerico <- c(1,2,3,4,5)
+vetor_caractere <- c("A","B","C")
+vetor_logico<- c(TRUE, FALSE, TRUE)
+
+# exibindo os vetores
+vetor_numerico
+vetor_caractere
+vetor_logico
+
+# verificando o tipo de cada vetor
+class(vetor_numerico)
+class(vetor_caractere)
+class(vetor_logico
+```
+
+```{r}
+fazer meu modelo aqui.
+```
+
+```         
+```
+
+```{r}
+# criando uma matriz
+matriz_exemplo <- matrix(1:9, nrow = 3, ncol = 3)
+
+# exibindo a matriz
+matriz_exemplo
+
+# verificando a classe
+class(matriz_exemplo)
+
+```
+
+Criando um data frame:
+
+```{r}
+df <-
+  data.frame(
+  nome = c("fernanda", "rebeca", "vitoria"),
+  idade= c(27,25,19),
+  sexo = factor(C("feminino", "maculino", "feminino"))
+)
+```
+
+verificando a estrutura do data frame:
+
+```{r}
+
+str(df)
+head(df)
+```
+
+verifcando os nomes das colunas do data frame:
+
+```{r}
+
+```
+
+listas:
+
+armazena varios tipos de dados
+
+criando frame:
+
+2.  crie um vetor para cada variavel
+
+```{r}
+# exemplo
+nomes <- c("victoria f.", "fernanda","Rebeca","victoria A", "Ana Carolina", " antonio", "luciana D.", "janete")
+
+idades <- c(23,27,
+             25,19,
+             54,54,
+             30,54)
+
+sexo <- c("f","f",
+          "f", "f",
+          "f","m",
+          "f", "f")
+amor <- c(1,2,
+          5,4,
+          5,4,
+          5,5)
+
+expectativa <- c(3,5,
+                 5,4,
+                 5,4,
+                 5,5)
+
+```
